@@ -1,0 +1,82 @@
+<script async>
+var its =  (function() {
+    if(!$ || !$.ajax || !WebSocket) {
+        console.log('')
+        return;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+
+    const logos_small = {
+        'open':   '/uploads/default/original/1X/8b87d68d981a0f3ae51901d73d7edb58ec4b2e95.svg',
+        'closed': '/uploads/default/original/1X/908739f5656be74fef21d880d35c4a35ba1dfe92.svg',
+        'error':  '/uploads/default/original/1X/6ae8cd0f059c88cccc7c932449ad29e89f61609c.svg'
+    }
+
+    const logos_big = {
+        'open':   '/uploads/default/original/1X/e86719ee609c4c8cca930a427adebb62dcad5a83.svg',
+        'closed': '/uploads/default/original/1X/6555198f546cc8cc03654d76892fce638ee16fe7.svg',
+        'error':  '/uploads/default/original/1X/c88a49f5fa3c032a48c0a2fa90326cbc4fa1ad34.svg'
+    };
+
+    ////////////////////////////////////////////////////////////////////////////
+
+    var url = new URL(new URL(location.href).origin);
+    url.protocol = url.protocol == 'https:' ? 'wss' : 'ws';
+    url += 'its-open-ws/';
+
+    function connect() {
+        console.log('isitopen: reconnecting');
+        var ws = new WebSocket(url);
+        register(ws);
+    }
+
+    function refresh() {
+            $.get('https://it-syndikat.org/api/status.txt')
+                .done(function(data) {
+                    var a = data.split(',');
+                    var isitopen = a[0];
+                    var up_date = new Date(parseInt(a[1]) * 1000);
+
+                    var state;
+
+                    if(isitopen === 'true')
+                        state = 'open';
+                    else if(isitopen === 'false')
+                        state = 'closed';
+                    else
+                        state = 'error';
+
+                    console.log('isitopen: it is', state);
+                    update_dom(state);
+                });
+    }
+
+    function update_dom(state) {
+        setTimeout(function() {
+            console.log('update_dom', state);
+
+            if($('.logo-big').length > 0) {
+                $('.logo-big').bind('DOMNodeRemoved', function(){ update_dom(state) });
+                $('.logo-big').attr('src', logos_big[state]).css('display', 'block');
+            } else if($('.logo-small').length > 0) {
+                $('.logo-small').bind('DOMNodeRemoved', function(){ update_dom(state) });
+                $('.logo-small').attr('src', logos_small[state]).css('display', 'block');
+            }
+        })
+    }
+
+    function register(ws) {
+        ws.onclose   = function() { connect(); };
+        ws.onmessage = function(event) { refresh(); };
+    }
+
+    refresh();
+    connect();
+
+    return {
+        'update_dom': update_dom,
+        'refresh': refresh
+    };
+})();
+</script>

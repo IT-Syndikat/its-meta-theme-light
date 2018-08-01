@@ -27,10 +27,22 @@ var its =  (function() {
     url.protocol = url.protocol == 'https:' ? 'wss' : 'ws';
     url += 'its-open-ws/';
 
+
+    var reconnect_delay = 1000;
+    var reconnect_giveup = 1000000;
+
     function connect() {
-        console.log('isitopen: reconnecting');
-        var ws = new WebSocket(url);
-        register(ws);
+        if(reconnect_delay > reconnect_giveup)
+            return;
+
+        setTimeout(function() {
+            console.log('isitopen: reconnecting');
+            var ws = new WebSocket(url);
+            register(ws);
+
+        }, reconnect_delay);
+
+        reconnect_delay *= 2;
     }
 
     function refresh() {

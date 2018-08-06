@@ -47,24 +47,27 @@ var its =  (function() {
     }
 
     function refresh() {
-            $.get('https://it-syndikat.org/api/status.txt')
-                .done(function(data) {
-                    var a = data.split(',');
-                    var isitopen = a[0];
-                    var up_date = new Date(parseInt(a[1]) * 1000);
+        $.get('https://it-syndikat.org/api/status.txt')
+            .then(function(data) {
+                var a = data.split(',');
+                var isitopen = a[0];
+                var up_date = new Date(parseInt(a[1]) * 1000);
 
-                    var state;
+                var state;
 
-                    if(isitopen === 'true')
-                        state = 'open';
-                    else if(isitopen === 'false')
-                        state = 'closed';
-                    else
-                        state = 'error';
+                if(isitopen === 'true')
+                    state = 'open';
+                else if(isitopen === 'false')
+                    state = 'closed';
+                else
+                    state = 'error';
 
-                    console.log('isitopen: it is', state);
-                    update_dom(state);
-                });
+                console.log('isitopen: it is', state);
+                update_dom(state);
+            }, function() {
+                console.log('isitopen: it is', 'error');
+                update_dom('error');
+            });
     }
 
     function update_dom(state) {

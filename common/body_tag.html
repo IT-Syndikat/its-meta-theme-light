@@ -77,6 +77,9 @@ var its =  (function() {
             if($('.logo-big').length > 0) {
                 $('.logo-big').bind('DOMNodeRemoved', function(){ update_dom(state) });
                 $('.logo-big').attr('src', logos_big[state]).css('display', 'block');
+            } else if($('.logo-mobile').length > 0) {
+                $('.logo-mobile').bind('DOMNodeRemoved', function(){ update_dom(state) });
+                $('.logo-mobile').attr('src', logos_big[state]).css('display', 'block');
             } else if($('.logo-small').length > 0) {
                 $('.logo-small').bind('DOMNodeRemoved', function(){ update_dom(state) });
                 $('.logo-small').attr('src', logos_small[state]).css('display', 'block');
